@@ -1,4 +1,5 @@
 ﻿using AuthApi.Context;
+using AuthApi.Helpers;
 using AuthApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -48,6 +49,7 @@ namespace AuthApi.Controllers
                 return BadRequest();
             }
 
+           
             await _authContext.AddAsync(userObj);
             await _authContext.SaveChangesAsync();
             return Ok(new
@@ -55,5 +57,31 @@ namespace AuthApi.Controllers
                 Message = "User Registered!"
             });
         }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] User userObj)
+        {
+            if(userObj ==null)
+            {
+                return BadRequest();
+            }
+            if(await CheckEmailExistAsync(userObj.Email))
+            {
+                return BadRequest(new { Message = "Email already exist!" });
+            }
+            userObj.Password = PasswordHasher.HasPassword(userObj.Password);
+            userObj.Role = "User";
+            userObj.Token = "";
+            await _authContext.AddAsync(userObj);
+            await _authContext.SaveChangesAsync();
+            return Ok(new
+            {
+                Message = "User Registered!"
+            });
+        }
+
+        private Task<bool> CheckEmailExistAsync(string email)
+            =>_authContext.Users.AnyAsync(x => x.Email == email);
+        
     }
 }
