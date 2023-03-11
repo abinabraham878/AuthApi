@@ -28,13 +28,33 @@ namespace AuthApi.Controllers
             var user = await _authContext.Users.FirstOrDefaultAsync(x => x.Email == userObj.Email && x.Password == userObj.Password);
 
             if(user == null)
-            {
-                return NotFound("User not found" );
+            { 
+                return NotFound(new
+                {
+                    Message = "User not found"
+                });
             }
 
             return Ok(new
             {
                 Message = "Login Success"
+            });
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] User userObj)
+        {
+            if(userObj ==null)
+            {
+                return BadRequest();
+            }
+
+           
+            await _authContext.AddAsync(userObj);
+            await _authContext.SaveChangesAsync();
+            return Ok(new
+            {
+                Message = "User Registered!"
             });
         }
 
