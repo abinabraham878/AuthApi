@@ -14,6 +14,11 @@ builder.Services.AddDbContext<AppDbContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnStrn"));
 });
 
+builder.Services.AddDbContext<DepartmentDbContext>(option =>
+{
+    option.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnStrn"));
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
